@@ -71,7 +71,7 @@ public class Dialog {
                     contact.setInputType(InputType.TYPE_CLASS_TEXT);
                     contact.setHint(R.string.client_name);
                 } else {
-                    contact.setInputType(InputType.TYPE_CLASS_NUMBER);
+                    contact.setInputType(InputType.TYPE_CLASS_PHONE);
                     contact.setHint(R.string.phone_number);
                 }
             }
