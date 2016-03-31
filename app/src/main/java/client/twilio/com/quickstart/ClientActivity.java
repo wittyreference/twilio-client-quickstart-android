@@ -7,6 +7,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.media.AudioManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.SystemClock;
 import android.support.annotation.NonNull;
@@ -46,7 +47,7 @@ public class ClientActivity extends AppCompatActivity implements DeviceListener,
 
     /*
      * You must provide a publicly accessible server to generate a Capability Token to connect to the Client service
-     * Refer to website documentation for additional details
+     * Refer to website documentation for additional details: https://www.twilio.com/docs/quickstart/php/android-client
      */
     private static final String TOKEN_SERVICE_URL = "TOKEN_SERVICE_URL";
 
@@ -56,7 +57,7 @@ public class ClientActivity extends AppCompatActivity implements DeviceListener,
     private Device clientDevice;
 
     /*
-     * A Connection represents a connection ebtwen a Device and Twilio Services.
+     * A Connection represents a connection between a Device and Twilio Services.
      * Connections are either outgoing or incoming, and not created directly.
      * An outgoing connection is created by Device.connect()
      * An incoming connection are created internally by a Device and hanged to the registered PendingIntent
@@ -258,15 +259,17 @@ public class ClientActivity extends AppCompatActivity implements DeviceListener,
     private void retrieveCapabilityToken(final ClientProfile newClientProfile) {
 
         // Correlate desired properties of the Device (from ClientProfile) to properties of the Capability Token
-        StringBuilder url = new StringBuilder();
-        url.append(TOKEN_SERVICE_URL);
-        url.append("?allowOutgoing=").append(newClientProfile.allowOutgoing);
+        // Correlate desired properties of the Device (from ClientProfile) to properties of the Capability Token
+        Uri.Builder b = Uri.parse(TOKEN_SERVICE_URL).buildUpon();
+        if (newClientProfile.isAllowOutgoing()) {
+            b.appendQueryParameter("allowOutgoing", newClientProfile.allowOutgoing ? "true" : "false");
+        }
         if (newClientProfile.isAllowIncoming() && newClientProfile.getName() != null) {
-            url.append("&&client=").append(newClientProfile.getName());
+            b.appendQueryParameter("client", newClientProfile.getName());
         }
 
         Ion.with(getApplicationContext())
-                .load(url.toString())
+                .load(b.toString())
                 .asString()
                 .setCallback(new FutureCallback<String>() {
                     @Override
@@ -292,9 +295,7 @@ public class ClientActivity extends AppCompatActivity implements DeviceListener,
      */
     private void connect(String contact, boolean isPhoneNumber) {
         // Determine if you're calling another client or a phone number
-        if (isPhoneNumber) {
-            contact = "+" + contact;
-        } else {
+        if (!isPhoneNumber) {
             contact = "client:" + contact.trim();
         }
 
