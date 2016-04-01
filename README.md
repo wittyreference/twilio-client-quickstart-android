@@ -1,4 +1,5 @@
-# twilio-client-quickstart-android
+# Twilio Client for Android - Quickstart Application
+
 A simple Android application demonstrating the use of Twilio Client. 
 
 Relies on: https://github.com/twilio/mobile-quickstart
