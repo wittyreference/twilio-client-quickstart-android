@@ -106,7 +106,7 @@ public class ClientActivity extends AppCompatActivity implements DeviceListener,
     private View callView;
     private View capabilityPropertiesView;
 
-    private boolean muteMircophone;
+    private boolean muteMicrophone;
     private boolean speakerPhone;
 
     @Override
@@ -352,7 +352,7 @@ public class ClientActivity extends AppCompatActivity implements DeviceListener,
         callView.setVisibility(View.INVISIBLE);
         chronometer.setVisibility(View.INVISIBLE);
 
-        muteMircophone = false;
+        muteMicrophone = false;
         speakerPhone = false;
 
         muteActionFab.setImageDrawable(ContextCompat.getDrawable(ClientActivity.this, R.drawable.ic_mic_green_24px));
@@ -387,7 +387,7 @@ public class ClientActivity extends AppCompatActivity implements DeviceListener,
     }
 
     /*
-     * Create an outgoing call UI dailog
+     * Create an outgoing call UI dialog
      */
     private void showCallDialog() {
         alertDialog = Dialog.createCallDialog(callClickListener(), cancelCallClickListener(), this);
@@ -478,11 +478,11 @@ public class ClientActivity extends AppCompatActivity implements DeviceListener,
                 /*
                  *  Mute/unmute microphone
                  */
-                muteMircophone = !muteMircophone;
+                muteMicrophone = !muteMicrophone;
                 if (connection != null) {
-                    connection.setMuted(muteMircophone);
+                    connection.setMuted(muteMicrophone);
                 }
-                if (muteMircophone) {
+                if (muteMicrophone) {
                     muteActionFab.setImageDrawable(ContextCompat.getDrawable(ClientActivity.this, R.drawable.ic_mic_off_red_24px));
                 } else {
                     muteActionFab.setImageDrawable(ContextCompat.getDrawable(ClientActivity.this, R.drawable.ic_mic_green_24px));
