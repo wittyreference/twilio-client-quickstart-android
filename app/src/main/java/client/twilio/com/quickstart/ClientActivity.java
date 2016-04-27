@@ -259,7 +259,6 @@ public class ClientActivity extends AppCompatActivity implements DeviceListener,
     private void retrieveCapabilityToken(final ClientProfile newClientProfile) {
 
         // Correlate desired properties of the Device (from ClientProfile) to properties of the Capability Token
-        // Correlate desired properties of the Device (from ClientProfile) to properties of the Capability Token
         Uri.Builder b = Uri.parse(TOKEN_SERVICE_URL).buildUpon();
         if (newClientProfile.isAllowOutgoing()) {
             b.appendQueryParameter("allowOutgoing", newClientProfile.allowOutgoing ? "true" : "false");
