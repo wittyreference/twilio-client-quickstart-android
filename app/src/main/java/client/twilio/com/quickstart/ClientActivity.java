@@ -211,6 +211,9 @@ public class ClientActivity extends AppCompatActivity implements DeviceListener,
             TextView incomingCapabilityTextView = (TextView) capabilityPropertiesView.findViewById(R.id.incoming_capability_registered_text);
             incomingCapabilityTextView.setText("Incoming Capability: " +Boolean.toString(ClientActivity.this.clientProfile.isAllowIncoming()));
 
+            TextView libraryVersionTextView = (TextView) capabilityPropertiesView.findViewById(R.id.library_version_text);
+            libraryVersionTextView.setText("Library Version: " + Twilio.getVersion());
+
         } catch (Exception e) {
             Log.e(TAG, "An error has occured updating or creating a Device: \n" + e.toString());
             Toast.makeText(ClientActivity.this, "Device error", Toast.LENGTH_SHORT).show();
