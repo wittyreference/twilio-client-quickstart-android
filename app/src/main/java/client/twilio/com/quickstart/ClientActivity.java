@@ -462,7 +462,7 @@ public class ClientActivity extends AppCompatActivity implements DeviceListener,
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
                 if (pendingConnection != null) {
-                    pendingConnection.disconnect();
+                    pendingConnection.reject();
                 }
                 resetUI();
                 alertDialog.dismiss();
