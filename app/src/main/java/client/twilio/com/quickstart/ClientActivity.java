@@ -151,7 +151,6 @@ public class ClientActivity extends AppCompatActivity implements DeviceListener,
      */
     private void initializeTwilioClientSDK() {
 
-        Twilio.setLogLevel(Log.DEBUG);
         if (!Twilio.isInitialized()) {
             Twilio.initialize(getApplicationContext(), new Twilio.InitListener() {
 
@@ -162,6 +161,7 @@ public class ClientActivity extends AppCompatActivity implements DeviceListener,
                  */
                 @Override
                 public void onInitialized() {
+                    Twilio.setLogLevel(Log.DEBUG);
                     /*
                      * Retrieve the Capability Token from your own web server
                      */
