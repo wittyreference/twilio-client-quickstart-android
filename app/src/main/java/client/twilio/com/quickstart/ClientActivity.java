@@ -65,6 +65,9 @@ public class ClientActivity extends AppCompatActivity implements DeviceListener,
     private Connection connection;
     private Connection pendingConnection;
 
+    private AudioManager audioManager;
+    private int savedAudioMode = AudioManager.MODE_INVALID;
+
     /*
      * A representation of the current properties of a client token
      */
@@ -127,6 +130,11 @@ public class ClientActivity extends AppCompatActivity implements DeviceListener,
          * Create a default profile (name=jenny, allowOutgoing=true, allowIncoming=true)
          */
         clientProfile = new ClientProfile("jenny", true, true);
+
+        /*
+         * Needed for setting/abandoning audio focus during call
+         */
+        audioManager = (AudioManager)getSystemService(Context.AUDIO_SERVICE);
 
         /*
          * Check microphone permissions. Needed in Android M.
@@ -357,20 +365,7 @@ public class ClientActivity extends AppCompatActivity implements DeviceListener,
         muteActionFab.setImageDrawable(ContextCompat.getDrawable(ClientActivity.this, R.drawable.ic_mic_green_24px));
         speakerActionFab.setImageDrawable(ContextCompat.getDrawable(ClientActivity.this, R.drawable.ic_speaker_off_black_24dp));
 
-        AudioManager audioManager = (AudioManager) getBaseContext().getSystemService(Context.AUDIO_SERVICE);
-        /*
-         * Request audio focus before making any device switch.
-         */
-        audioManager.requestAudioFocus(null, AudioManager.STREAM_VOICE_CALL,
-                AudioManager.AUDIOFOCUS_GAIN_TRANSIENT);
-
-        /*
-         * Start by setting MODE_IN_COMMUNICATION as default audio mode. It is
-         * required to be in this mode when playout and/or recording starts for
-         * best possible VoIP performance.
-         * Some devices have difficulties with speaker mode if this is not set.
-        */
-        audioManager.setMode(AudioManager.MODE_IN_COMMUNICATION);
+        setAudioFocus(false);
         audioManager.setSpeakerphoneOn(speakerPhone);
 
         chronometer.stop();
@@ -511,8 +506,7 @@ public class ClientActivity extends AppCompatActivity implements DeviceListener,
                  */
                 speakerPhone = !speakerPhone;
 
-                AudioManager audioManager = (AudioManager) getBaseContext().getSystemService(Context.AUDIO_SERVICE);
-                audioManager.setMode(AudioManager.MODE_IN_CALL);
+                setAudioFocus(true);
                 audioManager.setSpeakerphoneOn(speakerPhone);
 
                 if (speakerPhone) {
@@ -675,6 +669,28 @@ public class ClientActivity extends AppCompatActivity implements DeviceListener,
                 Toast.makeText(this,
                         "Microphone permissions needed. Please allow in App Settings for additional functionality.",
                         Toast.LENGTH_LONG).show();
+            }
+        }
+    }
+
+    private void setAudioFocus(boolean setFocus) {
+        if (audioManager != null) {
+            if (setFocus) {
+                savedAudioMode = audioManager.getMode();
+                // Request audio focus before making any device switch.
+                audioManager.requestAudioFocus(null, AudioManager.STREAM_VOICE_CALL,
+                        AudioManager.AUDIOFOCUS_GAIN_TRANSIENT);
+
+                /*
+                 * Start by setting MODE_IN_COMMUNICATION as default audio mode. It is
+                 * required to be in this mode when playout and/or recording starts for
+                 * best possible VoIP performance. Some devices have difficulties with speaker mode
+                 * if this is not set.
+                 */
+                audioManager.setMode(AudioManager.MODE_IN_COMMUNICATION);
+            } else {
+                audioManager.setMode(savedAudioMode);
+                audioManager.abandonAudioFocus(null);
             }
         }
     }
