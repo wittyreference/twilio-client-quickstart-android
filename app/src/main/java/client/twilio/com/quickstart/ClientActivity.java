@@ -358,14 +358,18 @@ public class ClientActivity extends AppCompatActivity implements DeviceListener,
         speakerActionFab.setImageDrawable(ContextCompat.getDrawable(ClientActivity.this, R.drawable.ic_speaker_off_black_24dp));
 
         AudioManager audioManager = (AudioManager) getBaseContext().getSystemService(Context.AUDIO_SERVICE);
-        // Request audio focus before making any device switch.
+        /*
+         * Request audio focus before making any device switch.
+         */
         audioManager.requestAudioFocus(null, AudioManager.STREAM_VOICE_CALL,
                 AudioManager.AUDIOFOCUS_GAIN_TRANSIENT);
 
-        // Start by setting MODE_IN_COMMUNICATION as default audio mode. It is
-        // required to be in this mode when playout and/or recording starts for
-        // best possible VoIP performance.
-        // Some devices have difficulties with speaker mode if this is not set.
+        /*
+         * Start by setting MODE_IN_COMMUNICATION as default audio mode. It is
+         * required to be in this mode when playout and/or recording starts for
+         * best possible VoIP performance.
+         * Some devices have difficulties with speaker mode if this is not set.
+        */
         audioManager.setMode(AudioManager.MODE_IN_COMMUNICATION);
         audioManager.setSpeakerphoneOn(speakerPhone);
 
