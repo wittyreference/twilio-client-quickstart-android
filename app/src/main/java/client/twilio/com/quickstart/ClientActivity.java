@@ -134,7 +134,7 @@ public class ClientActivity extends AppCompatActivity implements DeviceListener,
         /*
          * Needed for setting/abandoning audio focus during call
          */
-        audioManager = (AudioManager)getSystemService(Context.AUDIO_SERVICE);
+        audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
 
         /*
          * Check microphone permissions. Needed in Android M.
