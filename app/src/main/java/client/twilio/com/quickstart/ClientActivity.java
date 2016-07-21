@@ -62,7 +62,7 @@ public class ClientActivity extends AppCompatActivity implements DeviceListener,
      * An outgoing connection is created by Device.connect()
      * An incoming connection are created internally by a Device and hanged to the registered PendingIntent
      */
-    private Connection connection;
+    private Connection activeConnection;
     private Connection pendingConnection;
 
     private AudioManager audioManager;
@@ -315,7 +315,7 @@ public class ClientActivity extends AppCompatActivity implements DeviceListener,
 
         if (clientDevice != null) {
             // Create an outgoing connection
-            connection = clientDevice.connect(params, this);
+            activeConnection = clientDevice.connect(params, this);
             setCallUI();
         } else {
             Toast.makeText(ClientActivity.this, "No existing device", Toast.LENGTH_SHORT).show();
@@ -326,9 +326,9 @@ public class ClientActivity extends AppCompatActivity implements DeviceListener,
      * Disconnect an active connection
      */
     private void disconnect() {
-        if (connection != null) {
-            connection.disconnect();
-            connection = null;
+        if (activeConnection != null) {
+            activeConnection.disconnect();
+            activeConnection = null;
         }
     }
 
@@ -337,11 +337,11 @@ public class ClientActivity extends AppCompatActivity implements DeviceListener,
      */
     private void answer() {
         // Only one connection can exist at time, disconnecting any active connection.
-        if( connection != null ){
-            connection.disconnect();
+        if( activeConnection != null ){
+            activeConnection.disconnect();
         }
         pendingConnection.accept();
-        connection = pendingConnection;
+        activeConnection = pendingConnection;
         pendingConnection = null;
     }
 
@@ -491,8 +491,8 @@ public class ClientActivity extends AppCompatActivity implements DeviceListener,
                  *  Mute/unmute microphone
                  */
                 muteMicrophone = !muteMicrophone;
-                if (connection != null) {
-                    connection.setMuted(muteMicrophone);
+                if (activeConnection != null) {
+                    activeConnection.setMuted(muteMicrophone);
                 }
                 if (muteMicrophone) {
                     muteActionFab.setImageDrawable(ContextCompat.getDrawable(ClientActivity.this, R.drawable.ic_mic_off_red_24px));
@@ -588,14 +588,14 @@ public class ClientActivity extends AppCompatActivity implements DeviceListener,
 
     /* Connection Listener */
     @Override
-    public void onDisconnected(Connection inConnection) {
+    public void onDisconnected(Connection connection) {
         // Remote participant may have disconnected an incoming call before the local participant was able to respond, rejecting any existing pendingConnections
-        if( inConnection == pendingConnection ) {
+        if( connection == pendingConnection ) {
             pendingConnection = null;
             alertDialog.dismiss();
-        } else if (connection != null && inConnection != null) {
-            if (connection == inConnection) {
-                connection = null;
+        } else if (activeConnection != null && connection != null) {
+            if (activeConnection == connection) {
+                activeConnection = null;
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
@@ -609,11 +609,11 @@ public class ClientActivity extends AppCompatActivity implements DeviceListener,
 
     /* Connection Listener */
     @Override
-    public void onDisconnected(Connection inConnection, int errorCode, String error) {
+    public void onDisconnected(Connection connection, int errorCode, String error) {
         // A connection other than active connection could have errored out.
-        if (connection != null && inConnection != null) {
-            if (connection == inConnection) {
-                connection = null;
+        if (activeConnection != null && connection != null) {
+            if (activeConnection == connection) {
+                activeConnection = null;
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
