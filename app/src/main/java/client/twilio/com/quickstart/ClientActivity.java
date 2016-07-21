@@ -194,7 +194,7 @@ public class ClientActivity extends AppCompatActivity implements DeviceListener,
                 clientDevice = Twilio.createDevice(capabilityToken, this);
 
                 /*
-                 * Providing a PendingIntent to the newly create Device, allowing you to receive incoming calls
+                 * Providing a PendingIntent to the newly created Device, allowing you to receive incoming calls
                  *
                  *  What you do when you receive the intent depends on the component you set in the Intent.
                  *
@@ -249,6 +249,7 @@ public class ClientActivity extends AppCompatActivity implements DeviceListener,
             intent.removeExtra(Device.EXTRA_CONNECTION);
 
             pendingConnection = incomingConnection;
+            pendingConnection.setConnectionListener(this);
 
             showIncomingDialog();
         }
@@ -335,8 +336,11 @@ public class ClientActivity extends AppCompatActivity implements DeviceListener,
      * Accept an incoming connection
      */
     private void answer() {
+        // Only one connection can exist at time, disconnecting any active connection.
+        if( connection != null ){
+            connection.disconnect();
+        }
         pendingConnection.accept();
-        pendingConnection.setConnectionListener(this);
         connection = pendingConnection;
         pendingConnection = null;
     }
@@ -474,7 +478,6 @@ public class ClientActivity extends AppCompatActivity implements DeviceListener,
                 if (pendingConnection != null) {
                     pendingConnection.reject();
                 }
-                resetUI();
                 alertDialog.dismiss();
             }
         };
@@ -586,7 +589,11 @@ public class ClientActivity extends AppCompatActivity implements DeviceListener,
     /* Connection Listener */
     @Override
     public void onDisconnected(Connection inConnection) {
-        if (connection != null && inConnection != null) {
+        // Remote participant may have disconnected an incoming call before the local participant was able to respond, rejecting any existing pendingConnections
+        if( inConnection == pendingConnection ) {
+            pendingConnection = null;
+            alertDialog.dismiss();
+        } else if (connection != null && inConnection != null) {
             if (connection == inConnection) {
                 connection = null;
                 runOnUiThread(new Runnable() {
